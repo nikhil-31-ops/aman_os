@@ -1,0 +1,28 @@
+diff -Naur linux_kernel/arch/x86/entry/syscalls/syscall_64.tbl linux-5.15.5/arch/x86/entry/syscalls/syscall_64.tbl
+--- linux_kernel/arch/x86/entry/syscalls/syscall_64.tbl	2021-11-27 23:51:15.100016439 +0530
++++ linux-5.15.5/arch/x86/entry/syscalls/syscall_64.tbl	2021-11-25 14:19:08.000000000 +0530
+@@ -413,6 +413,5 @@
+ 545	x32	execveat		compat_sys_execveat
+ 546	x32	preadv2			compat_sys_preadv64v2
+ 547	x32	pwritev2		compat_sys_pwritev64v2
+-548	common	kernel_2d_memcpy	sys_kernel_2d_memcpy
+ # This is the end of the legacy x32 range.  Numbers 548 and above are
+ # not special and are not to be used for x32-specific syscalls.
+diff -Naur linux_kernel/kernel/sys.c linux-5.15.5/kernel/sys.c
+--- linux_kernel/kernel/sys.c	2021-11-27 23:57:34.790021674 +0530
++++ linux-5.15.5/kernel/sys.c	2021-11-25 14:19:08.000000000 +0530
+@@ -160,14 +160,6 @@
+  *
+  * Called with rcu_read_lock, creds are safe
+  */
+-SYSCALL_DEFINE3(kernel_2d_memcpy, unsigned long*,src,unsigned long* ,dst , unsigned long len){
+-	unsigned long buf;
+-	if(copy_from_user(&buf,src,len))
+-		return -EFAULT;
+-	if(copy_to_user(dst,&buf,len))
+-		return -EFAULT;
+-	return len;
+-}
+ static bool set_one_prio_perm(struct task_struct *p)
+ {
+ 	const struct cred *cred = current_cred(), *pcred = __task_cred(p);
